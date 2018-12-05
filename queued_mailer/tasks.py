@@ -1,8 +1,7 @@
-import logging
-
+from . import logger
 from .settings import EMAIL_BACKEND
 
 
 def send_message():
-    logging.info(EMAIL_BACKEND)
-    logging.info('sent')
+    logger.info(EMAIL_BACKEND)
+    logger.info('sent')
