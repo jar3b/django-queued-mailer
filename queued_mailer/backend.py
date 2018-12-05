@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from django.core.mail.backends.base import BaseEmailBackend
 from django.utils.encoding import force_text
 
