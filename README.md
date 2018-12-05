@@ -8,9 +8,15 @@ Django >= 1.11, Celery >= 4.1.1
 
 ### setup
 
-- add `git+https://github.com/jar3b/django-queued-mailer.git` to requirements.txt
-- install package `pip install --upgrade git+https://github.com/jar3b/django-queued-mailer.git`
-- run celery worker
+- Add `git+https://github.com/jar3b/django-queued-mailer.git` to requirements.txt
+- Install package `pip install --upgrade git+https://github.com/jar3b/django-queued-mailer.git`
+- Modify Django settings: set proper email backend
+
+```
+EMAIL_BACKEND = 'queued_mailer.backend.EmailBackend'
+```
+ 
+- Run celery worker
 
 ```
 celery -A project worker

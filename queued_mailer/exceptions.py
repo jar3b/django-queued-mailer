@@ -1,0 +1,2 @@
+class EmailTransportException(Exception):
+    pass
