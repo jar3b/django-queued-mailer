@@ -16,7 +16,7 @@ logger = get_task_logger(__name__)
 
 @celery.task(bind=True, queue=TASK_QUEUE_NAME, acks_late=True,
              default_retry_delay=20, autoretry_for=(EmailTransportException,), retry_kwargs={'max_retries': 5})
-def send_message(self, email, connection=None):
+def send_message(self, email):
     logger.debug('task started')
 
     start_time = time.time()
@@ -25,8 +25,7 @@ def send_message(self, email, connection=None):
         raise Exception('Invalid message class, only django.core.mail.EmailMessage is supported')
 
     try:
-        if connection is None:
-            connection = get_email_connection()
+        connection = get_email_connection()
 
         email.connection = connection
         email.send()
@@ -41,4 +40,4 @@ def send_message(self, email, connection=None):
         raise
 
     elapsed_time = time.time() - start_time
-    logger.warning("message sent, elasped time %s" % elapsed_time)
+    logger.warning("message sent, elapsed time %s" % elapsed_time)
