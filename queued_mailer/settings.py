@@ -6,8 +6,8 @@ EMAIL_BACKEND = getattr(
     "django.core.mail.backends.smtp.EmailBackend"
 )
 
-EMAIL_SEND_TASK = getattr(
+TASK_QUEUE_NAME = getattr(
     settings,
-    "QMAILER_SEND_TASK",
-    "queued_mailer.tasks.send_message"
+    "QMAILER_TASK_QUEUE_NAME",
+    "default"
 )
