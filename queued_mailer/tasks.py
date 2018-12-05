@@ -1,5 +1,6 @@
 # coding: utf-8
 import smtplib
+import ssl
 import time
 from socket import error as socket_error
 
@@ -21,10 +22,11 @@ class PersitentEmailConnectionTask(celery.Task):
     def connection(self):
         if self._connection is None:
             self._connection = get_email_connection()
-            print('NEW CONN')
-        else:
-            print('OLD CONN')
+
         return self._connection
+
+    def clean_connection(self):
+        self._connection = None
 
 
 @celery.task(bind=True, base=PersitentEmailConnectionTask, queue=TASK_QUEUE_NAME, acks_late=True,
@@ -40,6 +42,10 @@ def send_message(self, email):
     try:
         email.connection = self.connection
         email.send()
+    except (ssl.SSLError, smtplib.SMTPServerDisconnected) as e:
+        # nullify connection
+        self.clean_connection()
+        raise self.retry(e, countdown=1)
     except (socket_error, smtplib.SMTPSenderRefused,
             smtplib.SMTPRecipientsRefused,
             smtplib.SMTPDataError,
