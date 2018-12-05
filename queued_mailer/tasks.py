@@ -14,7 +14,20 @@ from .settings import TASK_QUEUE_NAME
 logger = get_task_logger(__name__)
 
 
-@celery.task(bind=True, queue=TASK_QUEUE_NAME, acks_late=True,
+class PersitentEmailConnectionTask(celery.Task):
+    _connection = None
+
+    @property
+    def connection(self):
+        if self._connection is None:
+            self._connection = get_email_connection()
+            print('NEW CONN')
+        else:
+            print('OLD CONN')
+        return self._connection
+
+
+@celery.task(bind=True, base=PersitentEmailConnectionTask, queue=TASK_QUEUE_NAME, acks_late=True,
              default_retry_delay=20, autoretry_for=(EmailTransportException,), retry_kwargs={'max_retries': 5})
 def send_message(self, email):
     logger.debug('task started')
@@ -25,9 +38,7 @@ def send_message(self, email):
         raise Exception('Invalid message class, only django.core.mail.EmailMessage is supported')
 
     try:
-        connection = get_email_connection()
-
-        email.connection = connection
+        email.connection = self.connection
         email.send()
     except (socket_error, smtplib.SMTPSenderRefused,
             smtplib.SMTPRecipientsRefused,
