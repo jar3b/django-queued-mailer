@@ -3,6 +3,6 @@ from .settings import EMAIL_BACKEND
 
 
 @app.task()
-def send_message():
+def send_message(email):
     logger.info(EMAIL_BACKEND)
-    logger.info('sent')
+    logger.info(email)
