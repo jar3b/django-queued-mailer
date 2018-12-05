@@ -2,7 +2,7 @@ from django.core.mail.backends.base import BaseEmailBackend
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 
-from . import logger
+from .logger import logger
 from .settings import EMAIL_SEND_TASK
 
 
@@ -24,7 +24,7 @@ class EmailBackend(BaseEmailBackend):
         num_sent = 0
         for email in email_messages:
             try:
-                self.task.apply_async([email,])
+                self.task.apply_async([email, ])
                 num_sent += 1
             except Exception as e:
                 logger.error("cannot send message %s: %r" % (_get_message_recipients(email), e))
